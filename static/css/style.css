@@ -1,0 +1,438 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 56px; /* Height of fixed navbar */
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar Styles */
+.navbar {
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    color: #0d6efd;
+}
+
+.navbar-brand img {
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.1);
+}
+
+.nav-link {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #0d6efd;
+}
+
+.nav-link.active {
+    color: #0d6efd;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    color: white;
+    padding: 8rem 0 4rem;
+    margin-top: -5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../img/pattern.png') repeat;
+    opacity: 0.1;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: #0d6efd;
+    margin-bottom: 1rem;
+}
+
+/* Topic Cards */
+/* .topic-card {
+    position: relative;
+    height: 300px;
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.topic-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.topic-card:hover img {
+    transform: scale(1.1);
+}
+
+.topic-card .overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+} */
+/* Topic Cards */
+.topic-card {
+    position: relative;
+    height: 300px;
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    background-image: url("{% static 'img/travel.png' %}");
+    background-size: contain; /* Đảm bảo hình ảnh vừa vặn mà không bị cắt xén */
+    background-position: center center; /* Căn giữa hình ảnh */
+    background-repeat: no-repeat; /* Không lặp lại hình ảnh */
+    transition: transform 0.3s ease; /* Thêm hiệu ứng hover cho cả div */
+}
+
+
+.topic-card .topic-card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent); /* Lớp phủ mờ */
+    color: white;
+}
+
+.topic-card .topic-card-content h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.topic-card .topic-card-content p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.topic-card:hover {
+    transform: scale(1.05); /* Phóng to khi hover */
+}
+
+/* Grammar Cards */
+.grammar-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.grammar-card:hover {
+    transform: translateY(-5px);
+}
+
+.grammar-card h3 {
+    color: #0d6efd;
+    margin-bottom: 1rem;
+}
+
+/* Chatbot Widget */
+.chatbot-widget {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+}
+
+.chatbot-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.chatbot-toggle:hover {
+    transform: scale(1.1);
+}
+
+.chatbot-container {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    flex-direction: column;
+}
+
+.chatbot-container.show {
+    display: flex;
+}
+
+.chatbot-header {
+    padding: 1rem;
+    background: #0d6efd;
+    color: white;
+    border-radius: 1rem 1rem 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.chatbot-messages {
+    flex-grow: 1;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    max-width: 80%;
+}
+
+.message.bot {
+    background: #f8f9fa;
+    margin-right: auto;
+}
+
+.message.user {
+    background: #0d6efd;
+    color: white;
+    margin-left: auto;
+}
+
+.chatbot-input {
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chatbot-input input {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+.chatbot-input button {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+/* Buttons */
+.btn-primary {
+    padding: 0.75rem 2rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+/* Progress Indicators */
+.progress-circle {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    margin: 0 auto;
+}
+
+.progress-circle svg {
+    transform: rotate(-90deg);
+}
+
+.progress-circle circle {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+}
+
+.progress-circle circle.bg {
+    stroke: #dee2e6;
+}
+
+.progress-circle circle.progress {
+    stroke: #0d6efd;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-circle .text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+/* Footer */
+footer {
+    background: #f8f9fa;
+    padding: 4rem 0 2rem;
+}
+
+footer h5 {
+    color: #0d6efd;
+    margin-bottom: 1rem;
+}
+
+footer ul li {
+    margin-bottom: 0.5rem;
+}
+
+footer a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #0d6efd;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .chatbot-container {
+        width: 100%;
+        height: 100%;
+        bottom: 0;
+        right: 0;
+        border-radius: 0;
+    }
+
+    .navbar-brand span {
+        display: none;
+    }
+}
+
+/* Form Styles */
+.form-control {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Alert Styles */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.alert-info {
+    background-color: #cff4fc;
+    color: #055160;
+} 
