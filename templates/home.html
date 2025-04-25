@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Home - English Learning Platform{% endblock %}
+{% block title %}Home - English Learning Platform{% endblock title %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -144,12 +144,21 @@
             </div>
             <div class="modal-body text-center">
                 <div class="d-grid gap-3">
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
-                    <a href="{% url 'home' %}" class="btn btn-outline-primary btn-lg">Register</a>
+                    <a href="{% url 'login_page' %}" class="btn btn-primary btn-lg">Login</a>
+                    <a href="{% url 'register_page' %}" class="btn btn-outline-primary btn-lg">Register</a>
                     <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">Try Without Account</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const msg = localStorage.getItem('welcome_msg');
+        if (msg) {
+            alert(msg); // hoặc bạn dùng Bootstrap Toast / Alert
+            localStorage.removeItem('welcome_msg'); // Xóa sau khi hiển thị
+        }
+    });
+</script>
 {% endblock %} 

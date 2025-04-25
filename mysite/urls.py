@@ -14,9 +14,13 @@ urlpatterns = [
     path('api/auth/register/', views.RegisterView.as_view(), name='register'),
     path('api/auth/login/', views.LoginView.as_view(), name='login'),
     path('api/auth/logout/', views.LogoutView.as_view(),name='logout'),
-    path('api/user/profile/',views.UserProfileView.as_view(),name='profile'),
+
+    path('api/user/account/',views.UserAccountView.as_view(),name='account'),
     path('api/user/change-password/',views.ChangePasswordView.as_view(),name='change_password'),
 
-    path('',views.home_page, name='home'),
-    path('login/',views.login_page, name='login_page'),
+    path('', views.home_page, name='home'),
+    path('login/', views.login_page, name='login_page'),
+    path('register/', views.register_page, name='register_page'),
+    path('change_password/', views.change_password_page, name='change_password_page'),
+    path('user/account/', views.account_page, name='account_page'),
 ]

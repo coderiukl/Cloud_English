@@ -436,3 +436,27 @@ footer a:hover {
     background-color: #cff4fc;
     color: #055160;
 } 
+
+#header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+#user-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+#user-avatar-initial {
+    display: none;
+    font-size: 0.9rem;
+    width: 100%;
+    height: 100%;
+    background-color: #0d6efd;
+    color: #fff;
+    font-weight: 600;
+}
+  

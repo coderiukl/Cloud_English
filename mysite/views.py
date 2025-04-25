@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
+from django.utils.timezone import now
 
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer, ChangePasswordSerializer
 
@@ -53,11 +54,14 @@ class LoginView(generics.GenericAPIView):
         password = serializer.validated_data['password']
         user = authenticate(request, email=email, password=password)
         if user is not None:
+            user.last_login = now()
+            user.save(update_fields=['last_login'])
+
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                'user': UserSerializer.data
+                'user': UserSerializer(user).data
             }, status=status.HTTP_200_OK)
         else:
             return Response({'error':'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -73,12 +77,17 @@ class LogoutView(generics.GenericAPIView):
             return Response({"message":"Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
+class UserAccountView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request':self.request})
+        return context
     
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
@@ -88,21 +97,25 @@ class ChangePasswordView(generics.UpdateAPIView):
         return self.request.user
     
     def update(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={'request':request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'message':'Đổi mật khẩu thành công'}, status=status.HTTP_200_OK)
 
-        if serializer.is_valid():
-            old_password = serializer.validated_data['old_password']
-            if not user.check_password(old_password):
-                return Response({'old_password':'Wrong password.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response({'message':"Password updated successfully"}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+# <Render templates HTML files>
 def home_page(request):
     return render(request, 'home.html')
 
 def login_page(request):
     return render(request, 'login.html')
+
+def register_page(request):
+    return render(request, 'register.html')
+
+def change_password_page(request):
+    return render(request, 'change_password.html')
+
+def account_page(request):
+    return render(request, 'user_account.html')
+
+# </Render templates HTML files>

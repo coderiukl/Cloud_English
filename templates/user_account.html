@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}Account Settings{% endblock title %}
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="row">
+    <div class="col-md-3 border-end">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link active text-danger fw-bold">Thông tin tài khoản</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'change_password_page' %}">Thay đổi mật khẩu</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-md-9">
+      <h4 class="mb-4">Thông tin tài khoản</h4>
+      <form id="account-info-form" enctype="multipart/form-data">
+        <div class="mb-3 d-flex align-items-center gap-3">
+          <img id="avatar-preview" src="" alt="Avatar" class="rounded-circle border" style="width: 60px; height: 60px; object-fit: cover;">
+          <input type="file" class="form-control form-control-sm w-auto" id="avatar" accept="image/*">
+        </div>
+
+        <!-- Các input người dùng -->
+        <div class="row">
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Tên đăng nhập</label>
+            <input type="text" class="form-control" id="username" disabled>
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="email">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Họ và tên</label>
+            <input type="text" class="form-control" id="name">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Ngày sinh</label>
+            <input type="date" class="form-control" id="birthday">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Giới tính</label>
+            <select class="form-select" id="gender">
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+              <option value="Khác">Khác</option>
+            </select>
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Thành phố</label>
+            <input type="text" class="form-control" id="city">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Quận/Huyện</label>
+            <input type="text" class="form-control" id="district">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Phường/Xã</label>
+            <input type="text" class="form-control" id="ward">
+          </div>
+          <div class="mb-3 col-md-12">
+            <label class="form-label">Địa chỉ (tên đường)</label>
+            <input type="text" class="form-control" id="street">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Công ty</label>
+            <input type="text" class="form-control" id="company">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Chức vụ</label>
+            <input type="text" class="form-control" id="position">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Trường ĐH/CĐ</label>
+            <input type="text" class="form-control" id="university">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Chuyên ngành</label>
+            <input type="text" class="form-control" id="major">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input type="text" class="form-control" id="phone">
+          </div>
+          <div class="mb-3 col-md-6">
+            <label class="form-label">Link Facebook</label>
+            <input type="url" class="form-control" id="facebook">
+          </div>
+          <div class="mb-3 col-md-12">
+            <label class="form-label">Mô tả</label>
+            <textarea class="form-control" id="bio" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <button class="btn btn-primary w-100 rounded-pill" type="submit">Cập nhật thông tin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  function formatDateToInput(value) {
+    if (!value) return '';
+    const parts = value.split('/');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    return value;
+  }
+
+  if (user) {
+    document.getElementById('username').value = user.email;
+    document.getElementById('email').value = user.email;
+    document.getElementById('name').value = user.name;
+    document.getElementById('birthday').value = formatDateToInput(user.birthday);
+    document.getElementById('gender').value = user.gender || 'Nam';
+    document.getElementById('city').value = user.city || '';
+    document.getElementById('district').value = user.district || '';
+    document.getElementById('ward').value = user.ward || '';
+    document.getElementById('street').value = user.street || '';
+    document.getElementById('company').value = user.company || '';
+    document.getElementById('position').value = user.position || '';
+    document.getElementById('university').value = user.university || '';
+    document.getElementById('major').value = user.major || '';
+    document.getElementById('phone').value = user.phone || '';
+    document.getElementById('facebook').value = user.facebook || '';
+    document.getElementById('bio').value = user.bio || '';
+
+    const preview = document.getElementById('avatar-preview');
+    const baseUrl = window.location.origin;
+    if (user.avatar) {
+      preview.src = user.avatar;
+    } else {
+      preview.src = '/static/img/default-avatar.png';
+    }
+  }
+
+  document.getElementById('avatar').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('avatar-preview');
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        preview.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.getElementById('account-info-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('access');
+
+    const formData = new FormData();
+    formData.append('email', document.getElementById('email').value);
+    formData.append('name', document.getElementById('name').value);
+    formData.append('birthday', document.getElementById('birthday').value);
+    formData.append('gender', document.getElementById('gender').value);
+    formData.append('city', document.getElementById('city').value);
+    formData.append('district', document.getElementById('district').value);
+    formData.append('ward', document.getElementById('ward').value);
+    formData.append('street', document.getElementById('street').value);
+    formData.append('company', document.getElementById('company').value);
+    formData.append('position', document.getElementById('position').value);
+    formData.append('university', document.getElementById('university').value);
+    formData.append('major', document.getElementById('major').value);
+    formData.append('phone', document.getElementById('phone').value);
+    formData.append('facebook', document.getElementById('facebook').value);
+    formData.append('bio', document.getElementById('bio').value);
+
+    const avatarFile = document.getElementById('avatar').files[0];
+    if (avatarFile) formData.append('avatar', avatarFile);
+
+    const res = await fetch('/api/user/account/', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('user', JSON.stringify(data));
+      loadUserAvatar();  // header cập nhật lại avatar từ user.avatar
+      alert('Cập nhật thông tin thành công!');
+    } else {
+      const firstKey = Object.keys(data)[0];
+      alert(data[firstKey][0]);
+    }
+  });
+});
+</script>
+{% endblock %}

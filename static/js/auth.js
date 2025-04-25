@@ -1,139 +1,46 @@
-// API endpoints
-const API_URL = '/api/auth';
+document.addEventListener('DOMContentLoaded', () => {
+    const access = localStorage.getItem('access');
+    const user = JSON.parse(localStorage.getItem('user'));
 
-// Login function
-async function login(username, password) {
-    try {
-        const response = await fetch('/login/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ username, password }),
-            credentials: 'include'
-        });
+    const navLogin = document.getElementById('nav-login');
+    const navRegister = document.getElementById('nav-register');
+    const userNav = document.getElementById('user-nav');
+    const userName = document.getElementById('user-name-display');
+    const logoutLink = document.getElementById('logoutlink');
 
-        const data = await response.json();
-        
-        if (response.ok) {
-            return data;
-        } else {
-            throw new Error(data.message || 'Login failed');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        throw error;
+    if (access && user) {
+        // Đã đăng nhập
+        userNav?.classList.remove('d-none');
+        navLogin?.classList.add('d-none');
+        navRegister?.classList.add('d-none');
+        if (userName) userName.textContent = user.name || user.email;
+    } else {
+        // Chưa đăng nhập
+        userNav?.classList.add('d-none');
+        navLogin?.classList.remove('d-none');
+        navRegister?.classList.remove('d-none');
     }
-}
 
-// Register function
-async function register(userData) {
-    try {
-        const response = await fetch('/register/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify(userData),
-            credentials: 'include'
+    // ✅ Gắn logout (nếu có)
+    if (logoutLink) {
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const refresh = localStorage.getItem('refresh');
+
+            try {
+                await fetch('/api/auth/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ refresh }),
+                });
+            } catch (error) {
+                console.warn('Logout failed:', error);
+            }
+
+            localStorage.clear();
+            window.location.href = '/';
         });
-
-        const data = await response.json();
-        
-        if (response.ok) {
-            return data;
-        } else {
-            throw new Error(data.message || 'Registration failed');
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        throw error;
-    }
-}
-
-// Logout function
-document.getElementById('logoutLink').addEventListener('click', async function(event) {
-    event.preventDefault();  // Ngừng hành động mặc định của thẻ <a> (không điều hướng)
-
-    // Xóa token JWT khỏi localStorage hoặc cookies
-    localStorage.removeItem('jwtToken');  // Hoặc xóa token từ cookies nếu bạn lưu ở đó
-
-    try {
-        const response = await fetch('/api/logout/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),  // CSRF token nếu bạn dùng Django
-            },
-            credentials: 'include',  // Đảm bảo rằng cookie sẽ được gửi cùng yêu cầu
-        });
-
-        if (!response.ok) {
-            throw new Error('Logout failed');
-        }
-
-        const data = await response.json();
-        if (data.message === "Logout successful.") {
-            // Nếu logout thành công, chuyển hướng về trang chủ
-            window.location.href = '/home';
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
     }
 });
-
-// Check if user is authenticated
-async function isAuthenticated() {
-    try {
-        const response = await fetch(`${API_URL}/status/`, {
-            credentials: 'include'
-        });
-        return response.ok;
-    } catch (error) {
-        console.error('Auth check error:', error);
-        return false;
-    }
-}
-
-// Get current user
-async function getCurrentUser() {
-    try {
-        const response = await fetch(`${API_URL}/status/`, {
-            credentials: 'include'
-        });
-        if (response.ok) {
-            return await response.json();
-        }
-        return null;
-    } catch (error) {
-        console.error('Get user error:', error);
-        return null;
-    }
-}
-
-// Helper function to get CSRF token from cookies
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// Export functions
-export {
-    login,
-    register,
-    logout,
-    isAuthenticated,
-    getCurrentUser
-}; 
