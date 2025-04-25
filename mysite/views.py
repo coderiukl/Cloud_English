@@ -1,10 +1,14 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer, ChangePasswordSerializer
+from .serializers import (
+    UserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer, ChangePasswordSerializer,
+    TopicSerializer, SectionSerializer, SubtopicSerializer, AudioExerciseSerializer
+)
 
-from .models import User
+from .models import User, Topic, Section, Subtopic, AudioExercise
 
 from rest_framework import status, generics
 from rest_framework.response import Response
@@ -102,10 +106,58 @@ class ChangePasswordView(generics.UpdateAPIView):
         serializer.save()
         return Response({'message':'Đổi mật khẩu thành công'}, status=status.HTTP_200_OK)
 
+class TopicView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = TopicSerializer
+    queryset = Topic.objects.all()
+
+class TopicDetailView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, topic_slug, format=None):
+        topic = get_object_or_404(Topic, slug=topic_slug)
+        query = request.GET.get('q','')
+        level = request.GET.get('level','all')
+
+        sections = Section.objects.filter(topic=topic).prefetch_related('subtopics')
+
+        for section in sections:
+            subs = section.subtopics.all().order_by('id')
+
+            should_filter = query or (level and level != 'all')
+
+            if should_filter:
+                if query:
+                    subs = subs.filter(title__icontains=query)
+                if level and level != 'all':
+                    subs = subs.filter(level=level)
+            section.filtered_subtopics = subs
+
+        topic_data = TopicSerializer(topic).data
+        return Response({
+            'topic':topic_data,
+            'sections':SectionSerializer(sections, many=True).data
+        })
+
+class ListenAndTypeView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, topic_slug, subtopic_slug, format=None):
+        topic = get_object_or_404(Topic, slug=topic_slug)
+        subtopic = get_object_or_404(Subtopic, slug=subtopic_slug)
+        exercises = AudioExercise.objects.filter(subtopic=subtopic).order_by('position')
+
+        # Chúng ta trả về tên topic, subtopic, và các bài tập
+        exercises_data = AudioExerciseSerializer(exercises, many=True).data
+        
+        return Response({
+            'topic': {'name': topic.name, 'slug': topic.slug},
+            'subtopic': {'title': subtopic.title, 'slug': subtopic.slug},
+            'exercises': exercises_data
+        })
 # <Render templates HTML files>
 def home_page(request):
     return render(request, 'home.html')
 
+# User template
 def login_page(request):
     return render(request, 'login.html')
 
@@ -117,5 +169,29 @@ def change_password_page(request):
 
 def account_page(request):
     return render(request, 'user_account.html')
+
+# Listen templates
+def topics_view_page(request):
+    return render(request, 'topics_view.html')
+
+def topic_detail_page(request, topic_slug):
+    topic = get_object_or_404(Topic,slug=topic_slug)
+    sections = Section.objects.filter(topic=topic).prefetch_related('subtopics')
+    return render(request, 'topic_detail.html', {'topic':topic, 'sections':sections})
+
+def listen_and_type_page(request, topic_slug, subtopic_slug):
+    topic = get_object_or_404(Topic, slug=topic_slug)
+    subtopic = get_object_or_404(Subtopic, slug=subtopic_slug)
+
+    exercises = AudioExercise.objects.filter(subtopic=subtopic).order_by('id','position')
+    return render(
+        request,
+        'listen_and_type.html',
+        {
+            'topic':topic,
+            'subtopic':subtopic,
+            'exercises': exercises
+        }
+    )
 
 # </Render templates HTML files>

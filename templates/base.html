@@ -37,7 +37,7 @@
                         <a class="nav-link" href="#grammar">Grammar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#listening">Listening</a>
+                        <a class="nav-link" href="{% url 'topics_view_page' %}">Listening</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#exercises">Exercises</a>
@@ -105,7 +105,7 @@
                     <ul class="list-unstyled">
                         <li><a href="{% url 'home' %}">Vocabulary</a></li>
                         <li><a href="#grammar">Grammar</a></li>
-                        <li><a href="#listening">Listening</a></li>
+                        <li><a href="{% url 'topics_view_page' %}">Listening</a></li>
                         <li><a href="#exercises">Exercises</a></li>
                     </ul>
                 </div>
@@ -192,7 +192,7 @@
             }
         }
         document.addEventListener('DOMContentLoaded', loadUserAvatar);
-      </script>          
+    </script>          
     {% block extra_js %}{% endblock extra_js %}
 </body>
 </html> 

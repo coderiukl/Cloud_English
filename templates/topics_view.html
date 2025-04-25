@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Topic List{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3 class="text-left mb-5">All topics</h3>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="topic-container">
+        <!-- Các topic sẽ được hiển thị ở đây -->
+    </div>
+</div>
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px); /* Đẩy card lên khi hover */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Tăng bóng đổ khi hover */
+    }
+    .topic-name {
+        transition: color 0.3s ease; /* Đảm bảo hiệu ứng mượt mà khi đổi màu */
+        color: #333; /* Màu mặc định */
+    }
+
+    .topic-name:hover {
+        color: #007bff; /* Màu xanh dương đẹp khi hover */
+        text-decoration: underline; /* Thêm gạch chân khi hover để tạo sự nổi bật */
+    }
+</style>
+<script>
+    // Fetch dữ liệu từ API /api/topics/
+    fetch('/api/topics/')
+        .then(response => response.json())
+        .then(data => {
+            const topicContainer = document.getElementById('topic-container');
+
+            // Sắp xếp các topic theo ID tăng dần
+            data.sort((a, b) => a.id - b.id);
+
+            // Duyệt qua các topic và tạo các card
+            data.forEach(topic => {
+                const topicCard = document.createElement('div');
+                topicCard.classList.add('col');  // Bootstrap column class
+
+                // Tạo nội dung cho từng card topic
+                topicCard.innerHTML = `
+                    <a href="/topics/${topic.slug}" style="text-decoration: none; color: inherit;">
+                        <div class="card shadow-sm" style="display: flex; flex-direction: row; align-items: center; height: 160px; transition: transform 0.3s ease;">
+                            <!-- Đẩy ảnh sang bên trái -->
+                            <img src="${topic.image}" class="card-img-left" alt="${topic.name}" style="object-fit: contain; height: 150px; width: 150px; border-radius: 8px 0 0 8px;">
+                            
+                            <!-- Nội dung bên cạnh ảnh -->
+                            <div class="card-body" style="flex: 1; padding-left: 15px; display: flex; flex-direction: column; justify-content: center;">
+                                <h5 class="card-title topic-name" style="font-size: 1rem; font-weight: bold; transition: color 0.3s ease;">${topic.name}</h5>
+                                <p style="font-size: 0.875rem; color: #555;"><strong>Levels:</strong> ${topic.levels}</p>
+                                <p style="font-size: 0.875rem; color: #555;"><strong>${topic.lessons} lessons</strong></p>
+                            </div>
+                        </div>
+                    </a>
+                `;
+
+                // Thêm card vào container
+                topicContainer.appendChild(topicCard);
+            });
+        })
+        .catch(error => console.error('Error fetching topics:', error));
+</script>
+{% endblock %}

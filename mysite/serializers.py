@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Topic, Section, Subtopic, AudioExercise
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from PIL import Image, ImageDraw, ImageFont
@@ -113,3 +113,28 @@ class ChangePasswordSerializer(serializers.Serializer):
         return user    
     
 # Listening 
+class SubtopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subtopic
+        fields = "__all__"
+
+class SectionSerializer(serializers.ModelSerializer):
+    subtopics = SubtopicSerializer(many=True)
+
+    class Meta:
+        model = Section
+        fields = "__all__" # Thông tin section và subtopics
+
+class TopicSerializer(serializers.ModelSerializer):
+    sections = SectionSerializer(many=True)
+
+    class Meta:
+        model = Topic
+        fields = "__all__" # Thông tin topic và sections
+
+class AudioExerciseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AudioExercise
+        fields = "__all__"
+
