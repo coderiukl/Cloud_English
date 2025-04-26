@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.http import JsonResponse
 
 from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer, ChangePasswordSerializer,
@@ -153,6 +154,29 @@ class ListenAndTypeView(APIView):
             'subtopic': SubtopicSerializer(subtopic).data,
             'exercises': exercises_data
         })
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_previous_next_subtopic(request, topic_slug, subtopic_id):
+    topic = get_object_or_404(Topic, slug=topic_slug)
+    current_subtopic = get_object_or_404(Subtopic, id=subtopic_id, topic=topic)
+
+    previous_subtopic = Subtopic.objects.filter(topic=topic, id__lt=current_subtopic.id).order_by('-id').first()
+    next_subtopic = Subtopic.objects.filter(topic=topic, id__gt=current_subtopic.id).order_by('id').first()
+
+    return JsonResponse({
+        'previous': {
+            'id': previous_subtopic.id,
+            'slug': previous_subtopic.slug,
+            'url': f"/topics/{topic.slug}/subtopics/{previous_subtopic.slug}/listen-and-type/"
+        } if previous_subtopic else None,
+        'next': {
+            'id': next_subtopic.id,
+            'slug': next_subtopic.slug,
+            'url': f"/topics/{topic.slug}/subtopics/{next_subtopic.slug}/listen-and-type/"
+        } if next_subtopic else None
+    })
+
 # <Render templates HTML files>
 def home_page(request):
     return render(request, 'home.html')

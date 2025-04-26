@@ -31,6 +31,8 @@ urlpatterns = [
     path('api/topics/', views.TopicView.as_view(), name='topic-view'),
     path('api/topics/<slug:topic_slug>/', views.TopicDetailView.as_view(), name='topic_detail'),
     path('api/topics/<slug:topic_slug>/subtopics/<slug:subtopic_slug>/listen-and-type/', views.ListenAndTypeView.as_view(), name='listen-and-type'),
+    path('api/topics/<slug:topic_slug>/subtopics/<int:subtopic_id>/next-prev/', views.get_previous_next_subtopic, name='next_prev_subtopic'),
+
 
     # Listening
     path('topics/', views.topics_view_page, name='topics_view_page'),   
