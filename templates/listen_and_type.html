@@ -1,50 +1,124 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<div class="container mt-5">
-    <h2 id="topic-name"></h2>
-    <h4 id="subtopic-title"></h4>
+<style>
+    .breadcrumb {
+      background-color: transparent;
+      padding-left: 0;
+      margin-bottom: 1rem;
+    }
+  
+    .breadcrumb a {
+      text-decoration: none;
+      color: #007bff;
+    }
+  
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+  
+    .breadcrumb-item + .breadcrumb-item::before {
+      content: " / ";
+    }
+    .is-valid {
+        border-color: #198754 !important;
+        background-color: #d1e7dd !important;
+    }
 
-    <!-- Phần hiển thị các bài tập -->
-    <div id="exercises-container" class="row"></div>
+    .is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #f8d7da !important;
+    }
+</style>
+<div id="api-url" data-url="/api/topics/{{ topic.slug }}/subtopics/{{ subtopic.slug }}/listen-and-type/"></div>
+<div class="container mt-4">
+    <!-- Breadcrumb điều hướng -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'topics_view_page' %}">All topics</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'topics_detail_page' topic.slug %}">{{ topic.name }}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ subtopic.title }}
+        </li>
+      </ol>
+    </nav>
 </div>
+<div class="container mt-5">
+  <h2 id="topic-name" class="fw-bold"></h2>
+  <h4 id="subtopic-title" class="mb-4 text-muted"></h4>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const topicSlug = "{{ topic.slug }}";
-        const subtopicSlug = "{{ subtopic.slug }}"; // Thêm thông tin về subtopic
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3" id="exerciseTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="dictation-tab" data-bs-toggle="tab" data-bs-target="#dictation" type="button" role="tab">Dictation</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="transcript-tab" data-bs-toggle="tab" data-bs-target="#transcript" type="button" role="tab">Full transcript</button>
+    </li>
+  </ul>
 
-        // Fetch dữ liệu từ API
-        fetch(`/api/topics/${topicSlug}/subtopics/${subtopicSlug}/listen-and-type/`)
-            .then(response => response.json())
-            .then(data => {
-                // Hiển thị tên topic và subtopic
-                document.getElementById('topic-name').textContent = data.topic.name;
-                document.getElementById('subtopic-title').textContent = data.subtopic.title;
+  <div class="tab-content">
+    <!-- Dictation tab -->
+    <div class="tab-pane fade show active" id="dictation" role="tabpanel">
+      <div class="card shadow-sm p-4" style="height: 500px">
+        <div class="d-flex justify-content-start gap-3 mb-3">
+          <button class="btn" id="prev-btn">←</button>
+          <span class="fw-bold"><span id="exercise-index">0</span> / <span id="exercise-total">0</span></span>
+          <button class="btn" id="next-btn">→</button>
+        </div>
+        <div id="exercise-content"></div>
+      </div>
+    </div>
 
-                const exercisesContainer = document.getElementById('exercises-container');
+    <!-- Full transcript tab -->
+    <div class="tab-pane fade" id="transcript" role="tabpanel">
+      <div class="card shadow-sm p-4">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <div>
+            <i class="bi bi-translate me-2"></i>Translation:
+            <select class="form-select d-inline w-auto" id="trans-lang">
+              <option selected>Vietnamese</option>
+              <option disabled>English</option>
+            </select>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" checked id="auto-scroll">
+            <label class="form-check-label" for="auto-scroll">Auto scroll</label>
+          </div>
+        </div>
 
-                data.exercises.forEach(exercise => {
-                    const exerciseCard = document.createElement('div');
-                    exerciseCard.classList.add('col-md-4', 'mb-3');  // Bootstrap class cho 3 cột
+        <audio id="full-audio" controls class="w-50 mb-3"></audio>
 
-                    exerciseCard.innerHTML = `
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <audio controls>
-                                    <source src="${exercise.audioSrc}" type="audio/mp3">
-                                    Your browser does not support the audio element.
-                                </audio>
-                                <input type="text" class="form-control mt-2" placeholder="Type what you hear">
-                                <small class="form-text text-muted">${exercise.correct_text}</small>
-                            </div>
-                        </div>
-                    `;
+        <div class="row">
+          <!-- Left slide -->
+          <div class="col-md-6">
+            <div id="slide-box" class="card text-center mb-3 p-4" style="height: 200px; display: flex; flex-direction: column; justify-content: center;">
+              <h5 id="slide-text" class="mb-2">Loading...</h5>
+              <p id="slide-translation" class="text-muted"></p>
+            </div>
+            <div class="d-flex justify-content-center gap-2">
+              <button class="btn" id="slide-prev">←</button>
+              <span class="fw-bold"><span id="slide-index">0</span> / <span id="slide-total">0</span></span>
+              <button class="btn" id="slide-next">→</button>
+            </div>
+          </div>
 
-                    exercisesContainer.appendChild(exerciseCard);
-                });
-            })
-            .catch(error => console.error('Error fetching exercise data:', error));
-    });
-</script>
-{% endblock %}
+          <!-- Right list -->
+          <div class="col-md-6">
+            <ul class="list-group" id="transcript-list" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;"></ul>
+          </div>
+        </div>
+
+        <p class="text-muted mt-3 text-center">Press "Space" to Play/Pause &middot; Press ← and → to move between sentences.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block extra_js %}
+<script src="{% static 'js/listen_and_type.js' %}"></script>
+{% endblock extra_js %}

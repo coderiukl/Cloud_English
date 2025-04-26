@@ -9,38 +9,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutLink = document.getElementById('logoutlink');
 
     if (access && user) {
-        // Đã đăng nhập
         userNav?.classList.remove('d-none');
         navLogin?.classList.add('d-none');
         navRegister?.classList.add('d-none');
         if (userName) userName.textContent = user.name || user.email;
     } else {
-        // Chưa đăng nhập
         userNav?.classList.add('d-none');
         navLogin?.classList.remove('d-none');
         navRegister?.classList.remove('d-none');
     }
 
-    // ✅ Gắn logout (nếu có)
-    if (logoutLink) {
-        logoutLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const refresh = localStorage.getItem('refresh');
+    logoutLink?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const refresh = localStorage.getItem('refresh');
 
-            try {
-                await fetch('/api/auth/logout/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ refresh }),
-                });
-            } catch (error) {
-                console.warn('Logout failed:', error);
-            }
+        try {
+            await fetch('/api/auth/logout/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh }),
+            });
+        } catch (error) {
+            console.warn('Logout failed:', error);
+        }
 
-            localStorage.clear();
-            window.location.href = '/';
-        });
-    }
+        localStorage.clear();
+        window.location.href = '/';
+    });
 });

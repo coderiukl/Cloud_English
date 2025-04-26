@@ -150,7 +150,7 @@ class ListenAndTypeView(APIView):
         
         return Response({
             'topic': {'name': topic.name, 'slug': topic.slug},
-            'subtopic': {'title': subtopic.title, 'slug': subtopic.slug},
+            'subtopic': SubtopicSerializer(subtopic).data,
             'exercises': exercises_data
         })
 # <Render templates HTML files>

@@ -120,3 +120,40 @@ document.addEventListener('DOMContentLoaded', function() {
         animateProgressCircle(circle, percent);
     });
 }); 
+
+function loadUserAvatar() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return;
+
+    const avatarImg = document.getElementById('user-avatar-img');
+    const avatarInitial = document.getElementById('user-avatar-initial');
+    const nameDisplay = document.getElementById('user-name-display');
+
+    if (!avatarImg || !avatarInitial) return;
+    if (nameDisplay) nameDisplay.textContent = user.name || user.email;
+
+    if (user.avatar) {
+        const baseUrl = window.location.origin;
+        const url = user.avatar;
+        avatarImg.src = url;
+
+        avatarImg.onload = () => {
+        avatarImg.style.display = 'block';
+        avatarImg.style.zIndex = '1';
+        avatarInitial.classList.add('d-none');  // ⬅ dùng class
+        };
+
+        avatarImg.onerror = () => {
+        const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase();
+        avatarInitial.textContent = initials;
+        avatarInitial.classList.remove('d-none');
+        avatarImg.style.display = 'none';
+        };
+    } else {
+        const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase();
+        avatarInitial.textContent = initials;
+        avatarInitial.classList.remove('d-none');
+        avatarImg.style.display = 'none';
+    }
+}
+document.addEventListener('DOMContentLoaded', loadUserAvatar);
